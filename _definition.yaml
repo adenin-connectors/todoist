@@ -24,6 +24,6 @@ Custom2Hint: ''
 Custom3Label: Custom Field 3
 Custom3Hint: ''
 Scopes:
-- ScopeName: data:read
-  ScopeDescription: Read access to data.
+- ScopeName: data:read_write
+  ScopeDescription: Read and Write access to data.
   IsDefault: false
