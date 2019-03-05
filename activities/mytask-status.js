@@ -28,19 +28,17 @@ module.exports = async (activity) => {
         color: 'blue',
         value: response.body.length,
         actionable: true
-      }
+      };
     } else {
       taskStatus = {
         ...taskStatus,
         description: `You have no tasks due today`,
         actionable: false
-      }
+      };
     }
 
     activity.Response.Data = taskStatus;
-
   } catch (error) {
-
-    cfActivity.handleError(error, activity);
+    cfActivity.handleError(activity, error);
   }
 };

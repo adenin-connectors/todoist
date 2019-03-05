@@ -37,23 +37,8 @@ function api(path, opts) {
   }
 
   return got(url, opts).catch(err => {
-
     throw err;
   });
-}
-// convert response from /issues endpoint to 
-api.convertIssues = function (response) {
-  let items = [];
-  let tasks = response.body;
-
-  // iterate through each issue and extract id, title, etc. into a new array
-  for (let i = 0; i < tasks.length; i++) {
-    let raw = tasks[i];
-    let item = { id: raw.id, priority: raw.priority, description: raw.content, link: raw.url, raw: raw }
-    items.push(item);
-  }
-
-  return { items: items };
 }
 const helpers = [
   'get',
@@ -71,7 +56,7 @@ api.stream = (url, opts) => apigot(url, Object.assign({}, opts, {
 
 api.initialize = function (activity) {
   _activity = activity;
-}
+};
 
 for (const x of helpers) {
   const method = x.toUpperCase();
