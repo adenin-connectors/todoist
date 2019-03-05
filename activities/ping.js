@@ -12,7 +12,7 @@ module.exports = async (activity) => {
       success: response && response.statusCode === 200
     };
   } catch (error) {
-    cfActivity.handleError(activity, error);
+    cfActivity.handleError(activity, error, [403]);
     activity.Response.Data.success = false;
   }
 };

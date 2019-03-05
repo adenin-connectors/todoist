@@ -16,7 +16,7 @@ module.exports = async function (activity) {
 
     activity.Response.Data = convertResponse(response);
   } catch (error) {
-    cfActivity.handleError(activity, error);
+    cfActivity.handleError(activity, error, [403]);
   }
 };
 
