@@ -1,30 +1,25 @@
 'use strict';
-
-const cfActivity = require('@adenin/cf-activity');
 const api = require('./common/api');
 
 module.exports = async (activity) => {
   try {
-    api.initialize(activity);
     //const response = await api('/tasks?filter=overdue|today');
     const response = await api('/tasks');
 
-    if (!cfActivity.isResponseOk(activity, response)) {
-      return;
-    }
+    if (Activity.isErrorResponse(response)) return;
 
     let taskStatus = {
-      title: 'Active Tasks',
+      title: T('Active Tasks'),
       url: 'https://todoist.com/app',
-      urlLabel: 'All tasks',
+      urlLabel: T('All Tasks')
     };
 
     let taskCount = response.body.length;
-
+    
     if (taskCount != 0) {
       taskStatus = {
         ...taskStatus,
-        description: `You have ${taskCount > 1 ? taskCount + " tasks" : taskCount + " tasks"} due today`,
+        description: taskCount > 1 ? T("You have {0} tasks.", taskCount) : T("You have 1 task."),
         color: 'blue',
         value: response.body.length,
         actionable: true
@@ -32,13 +27,13 @@ module.exports = async (activity) => {
     } else {
       taskStatus = {
         ...taskStatus,
-        description: `You have no tasks due today`,
+        description: T(`You have no tasks.`),
         actionable: false
       };
     }
 
     activity.Response.Data = taskStatus;
   } catch (error) {
-    cfActivity.handleError(activity, error, [403]);
+    Activity.handleError(error, [403]);
   }
 };
