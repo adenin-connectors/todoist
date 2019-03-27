@@ -10,12 +10,12 @@ module.exports = async (activity) => {
 
     let taskStatus = {
       title: T('Active Tasks'),
-      url: 'https://todoist.com/app',
-      urlLabel: T('All Tasks')
+      link: 'https://todoist.com/app',
+      linkLabel: T('All Tasks')
     };
 
     let taskCount = response.body.length;
-    
+
     if (taskCount != 0) {
       taskStatus = {
         ...taskStatus,
