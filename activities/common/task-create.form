@@ -1,0 +1,37 @@
+$type: form
+properties:
+  description:
+    type: string
+    title: Content
+    xtype: textarea
+    name: description
+  duetime:
+    type: string
+    title: Due Date
+    xtype: datetime
+    name: datetime
+    required: !!bool false
+  priority:
+    type: string
+    title: Priority
+    xtype: enum
+    name: priority
+    xvaluelist:
+      - value: 4
+        title: Urgent
+      - value: 3
+        title: High
+      - value: 2
+        title: Normal
+      - value: 1
+        title: Low
+    default: 2
+rules:
+  - caption: 'Rule #1'
+    position: !!int 1
+    rule:
+      conditions:
+        kind: all
+        conditions: []
+      actions: []
+$meta: {}
