@@ -3,7 +3,10 @@ const api = require('./common/api');
 
 module.exports = async function (activity) {
   try {
-    //const response = await api('/tasks?filter=overdue|today');
+
+    // THIS API REQUIRES PAYMENT TO USE FILTERS :
+    // 
+    // const response = await api('/tasks?filter=overdue|today');
     api.initialize(activity);
     const response = await api('/tasks');
     if ($.isErrorResponse(activity, response)) return;
