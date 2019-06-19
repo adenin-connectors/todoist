@@ -11,23 +11,39 @@ module.exports = async function (activity) {
     const response = await api('/tasks');
     if ($.isErrorResponse(activity, response)) return;
 
-    let value = response.body.length;
+    let tasks = convertResponse(response.body);
+
+    let daterange = $.dateRange(activity);
+    tasks = filterByDateRange(tasks, daterange);
+
+    tasks.sort((a, b) => {
+      return new Date(b.date) - new Date(a.date); //descending
+    });
+
+    let value = tasks.length;
+    let dateToAssign = tasks.length > 0 ? tasks[0].date : null;
     const pagination = $.pagination(activity);
-    let pagiantedItems = paginateItems(response.body, pagination);
+    tasks = paginateItems(tasks, pagination);
 
-    activity.Response.Data.items = convertResponse(pagiantedItems);
-    activity.Response.Data.title = T(activity, 'Active Tasks');
-    activity.Response.Data.link = 'https://todoist.com/app';
-    activity.Response.Data.linkLabel = T(activity, 'All Tasks');
-    activity.Response.Data.actionable = value > 0;
 
-    if (value > 0) {
-      activity.Response.Data.value = value;
-      activity.Response.Data.color = 'blue';
-      activity.Response.Data.description = value > 1 ? T(activity, "You have {0} tasks.", value)
-        : T(activity, "You have 1 task.");
-    } else {
-      activity.Response.Data.description = T(activity, `You have no tasks.`);
+    activity.Response.Data.items = tasks;
+
+    // exclude status if page > 1
+    if (parseInt(pagination.page) == 1) {
+      activity.Response.Data.title = T(activity, 'Active Tasks');
+      activity.Response.Data.link = 'https://todoist.com/app';
+      activity.Response.Data.linkLabel = T(activity, 'All Tasks');
+      activity.Response.Data.actionable = value > 0;
+
+      if (value > 0) {
+        activity.Response.Data.value = value;
+        activity.Response.Data.date = dateToAssign;
+        activity.Response.Data.color = 'blue';
+        activity.Response.Data.description = value > 1 ? T(activity, "You have {0} tasks.", value)
+          : T(activity, "You have 1 task.");
+      } else {
+        activity.Response.Data.description = T(activity, `You have no tasks.`);
+      }
     }
   } catch (error) {
     $.handleError(activity, error, [403]);
@@ -45,14 +61,14 @@ function convertResponse(tasks) {
       id: raw.id,
       name: raw.content,
       description: `Priority: ${getTaskPriority(raw.priority)}`,
-      date: raw.created,
+      date: new Date(raw.created).toISOString(),
       link: raw.url,
       raw: raw
     };
     items.push(item);
   }
 
-  return { items };
+  return items;
 }
 
 function getTaskPriority(priority) {
@@ -88,12 +104,12 @@ function paginateItems(items, pagination) {
 //**filters tasks based on provided daterange */
 function filterByDateRange(tasks, daterange) {
   let filteredLeads = [];
-  const timeMin = new Date(daterange.startDate).valueOf();
-  const timeMax = new Date(daterange.endDate).valueOf();
+  const timeMin = Date.parse(daterange.startDate);
+  const timeMax = Date.parse(daterange.endDate);
 
   for (let i = 0; i < tasks.length; i++) {
-    let createTime = new Date(tasks[i].created).valueOf();
-    if (createTime> timeMin && createTime < timeMax) {
+    let createTime = Date.parse(tasks[i].date);
+    if (createTime > timeMin && createTime < timeMax) {
       filteredLeads.push(tasks[i]);
     }
   }
